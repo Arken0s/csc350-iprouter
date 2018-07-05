@@ -100,8 +100,8 @@ public class IPRouter {
                             }
                         }
                         
-                     /* System.out.println("Sending ping reply to " + sourceAddress);
-                        IPPacket outgoingIPPacket = new IPPacket(3, sourceAddress, 0, "This is a ping reply.");
+                       System.out.println("Sending ping reply to " + sourceAddress);
+                    /* IPPacket outgoingIPPacket = new IPPacket(3, sourceAddress, 0, "This is a ping reply.");
                         outgoingPacket = new SendDetail(sourceAddress, 4445, outgoingIPPacket);*/
                         outgoingPacket = Ping(sourceAddress, sourcePort, incomingIPPacket);
                         needToSend = true;
@@ -137,8 +137,22 @@ public class IPRouter {
                             if (node.getIpAddress() != sourceAddress) {
                                 Node newNode = new Node(sourceAddress, sourceAddress, -1);
                                 routingTable.add(newNode);
+                            }   
+                        }
+                        System.out.println("Received Message from "+ sourceAddress);
+                        InetAddress destAddress = incomingIPPacket.getAddress(); //gets destination address from IPPacket
+                        InetAddress nextHop; //address to forward the IPPacket to
+                        // compare destination address to nodes in routingTabe and set destination address to nexthop
+                        for (Node node : routingTable){
+                            if (node.getIpAddress() == destAddress){
+                                nextHop = node.getForwardingNode();//setting msg address
+                                System.out.println("Setting forwarding Node to " + nextHop);
                             }
                         }
+                        //creating SendDetail
+                        SendDetail sd = new SendDetail(nextHop, 4445, incomingIPPacket);
+                        System.out.println("Forwarding message from "+ sourceAddress +" to "+ nextHop);
+                        
                         break;
                     default:
                         System.out.println("Something went wrong. "
